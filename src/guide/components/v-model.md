@@ -49,6 +49,50 @@ const model = defineModel()
 
 [Playground Example](https://play.vuejs.org/#eNqFUtFKwzAU/ZWYl06YLbK30Q10DFSYigq+5KW0t11mmoQknZPSf/cm3eqEsT0l555zuefmpKV3WsfbBuiUpjY3XDtiwTV6ziSvtTKOLNZcFKQ0qiZRnATkG6JB0BIDJen2kp5iMlfSOlLbisw8P4oeQAhFPpURxVV0zWSa9PNwEgIHtRaZA0SEpOvbeduG5q5LE0Sh2jvZ3tSqADFjFHlGSYJkmhz10zF1FseXvIo3VklcrfX9jOaq1lyAedGOoz1GpyQwnsvQ3fdTqDnTwPhQz9eQf52ob+zO1xh9NWDBbIHRgXOZqcD19PL9GXZ4H0h03whUnyHfwCrReI+97L6RBdo+0gW3j+H9uaw+7HLnQNrDUt6oV3ZBzyhmsjiz+p/dSTwJfUx2+IpD1ic+xz5enwQGXEDJJaw8Gl2I1upMzlc/hEvdOBR6SNKAjqP1J6P/o6XdL11L5h4=)
 
+## TypeScript usage with defineModel {#usage-with-define-model}
+
+Vue 3.4 adds `defineModel` which reduces the boiler plate. The following shows how to create a custom component that acts like the [Form fields](https://vuejs.org/guide/essentials/forms.html) to add to your component library.
+
+```vue
+// MyCustomField.vue
+<template>
+  <div>
+    <label>{{label}}
+      <input
+        v-bind="$attrs"
+        @input="handleInput"
+        :value="modelValue"
+      />
+    </label>
+  </div>
+</template>
+<script lang="ts" setup>
+// the name *must* be `modelValue` in order for it be be used with `v-model`
+const modelValue = defineModel<string>({ required: true });
+const { label } = defineProps<{
+  label: string
+}>();
+const handleInput = (e: Event) => {
+  // casting is needed in order to get the `value`
+  modelValue.value = (e.target as HTMLInputElement).value;
+};
+</script>
+```
+
+Then used as 
+```vue
+<template>
+  <div>
+    <MyCustomField label="A field label" v-model="myInput" />
+    <MyCustomField label="Another field label" v-model="mySecondInput" />
+</template>
+<script lang="ts" setup>
+import { ref } from "vue";
+const myInput = ref("");
+const mySecondInput = ref("");
+</script>
+```
+
 ### Under the Hood {#under-the-hood}
 
 `defineModel` is a convenience macro. The compiler expands it to the following:
